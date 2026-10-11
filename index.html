@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection Premium | Photos & Vidéos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0b0d10;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      color: #ffffff;
+      line-height: 1.5;
+    }
+
+    /* Fond dégradé subtil */
+    .background-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 15% 20%, rgba(80, 120, 255, 0.12), transparent 45%),
+                  radial-gradient(circle at 85% 75%, rgba(200, 70, 255, 0.1), transparent 45%),
+                  radial-gradient(circle at 50% 50%, rgba(30, 40, 80, 0.3), transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Conteneur principal */
+    .main-container {
+      max-width: 1300px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* En-tête global */
+    .page-header {
+      text-align: center;
+      margin-bottom: -0.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(to right, #ffffff, #c0c9ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: #8e98ad;
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Grille des deux sections */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    /* Carte individuelle */
+    .card {
+      background: rgba(18, 22, 28, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 2.5rem;
+      padding: 2rem;
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, transparent, rgba(110, 130, 255, 0.6), transparent);
+      opacity: 0.7;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(110, 130, 255, 0.15) inset;
+    }
+
+    /* Badge de type de contenu */
+    .content-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      width: fit-content;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .photos-badge {
+      background: linear-gradient(135deg, rgba(80, 110, 255, 0.25), rgba(140, 80, 255, 0.15));
+      color: #a8b8ff;
+      border-color: rgba(120, 140, 255, 0.3);
+    }
+
+    .videos-badge {
+      background: linear-gradient(135deg, rgba(255, 80, 120, 0.2), rgba(255, 140, 50, 0.15));
+      color: #ffb0a0;
+      border-color: rgba(255, 130, 100, 0.3);
+    }
+
+    /* Aperçu média */
+    .media-preview {
+      position: relative;
+      border-radius: 1.8rem;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: #1e232b;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.7);
+      flex-shrink: 0;
+    }
+
+    .media-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: blur(4px) brightness(0.55);
+      transform: scale(1.05);
+      transition: filter 0.4s ease, transform 0.4s ease;
+    }
+
+    /* Effet spécial vidéo : overlay play */
+    .video-overlay-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.8rem;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(20, 25, 35, 0.7);
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(6px);
+      z-index: 2;
+      transition: transform 0.2s ease;
+    }
+
+    .lock-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 12, 18, 0.35);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      gap: 0.8rem;
+      z-index: 1;
+    }
+
+    .lock-icon {
+      font-size: 2.6rem;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      background: rgba(20, 25, 35, 0.75);
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      animation: softPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes softPulse {
+      0% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+      100% { opacity: 0.85; transform: scale(1); }
+    }
+
+    .media-label {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e0e5ff;
+    }
+
+    /* Contenu de la carte */
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .card-content h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .photos-title {
+      background: linear-gradient(to right, #ffffff, #c8d4ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .videos-title {
+      background: linear-gradient(to right, #ffffff, #ffd0c0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .card-description {
+      color: #9aa4b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Liste des features */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin: 0.3rem 0;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: #cbd2e2;
+      font-size: 0.9rem;
+    }
+
+    .feature i {
+      font-size: 1rem;
+      width: 18px;
+      text-align: center;
+    }
+
+    .photos-feature i {
+      color: #7e8eff;
+    }
+
+    .videos-feature i {
+      color: #ff8a7a;
+    }
+
+    /* Section prix */
+    .price-section {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+
+    .price {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .photos-price {
+      background: linear-gradient(135deg, #ffffff, #b7c0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .videos-price {
+      background: linear-gradient(135deg, #ffffff, #ffb8a8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .price-period {
+      color: #7f8a9f;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    /* Bouton de paiement */
+    .payment-button {
+      border: none;
+      padding: 1.1rem 1.5rem;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-top: 0.5rem;
+      letter-spacing: 0.3px;
+      width: 100%;
+    }
+
+    .photos-button {
+      background: linear-gradient(145deg, #3e4eff, #6e3eff);
+      box-shadow: 0 18px 30px -12px rgba(62, 78, 255, 0.5);
+    }
+
+    .photos-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 25px 35px -12px rgba(90, 78, 255, 0.8);
+      background: linear-gradient(145deg, #4a5aff, #7a4aff);
+    }
+
+    .videos-button {
+      background: linear-gradient(145deg, #ff4a6a, #ff7a3e);
+      box-shadow: 0 18px 30px -12px rgba(255, 80, 100, 0.45);
+    }
+
+    .videos-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 25px 35px -12px rgba(255, 110, 80, 0.7);
+      background: linear-gradient(145deg, #ff5a7a, #ff8a4e);
+    }
+
+    .payment-button i {
+      font-size: 1.15rem;
+      transition: transform 0.2s ease;
+    }
+
+    .payment-button:hover i {
+      transform: translateX(3px);
+    }
+
+    .payment-button:active {
+      transform: translateY(0px);
+    }
+
+    .photos-button:active {
+      box-shadow: 0 10px 20px -8px #3e4eff;
+    }
+
+    .videos-button:active {
+      box-shadow: 0 10px 20px -8px #ff4a6a;
+    }
+
+    /* Badge paiement sécurisé */
+    .secure-payment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: #6c778c;
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .secure-payment i {
+      margin-right: 0.25rem;
+      color: #5f6b85;
+    }
+
+    /* Séparateur vertical décoratif entre les cartes (visible sur grand écran) */
+    .sections-grid::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 10%;
+      height: 80%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.08), transparent);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .sections-grid {
+      position: relative;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sections-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .sections-grid::before {
+        display: none;
+      }
+
+      .page-header h1 {
+        font-size: 2.2rem;
+      }
+
+      .card {
+        padding: 1.8rem;
+      }
+
+      .card-content h2 {
+        font-size: 1.6rem;
+      }
+
+      .price {
+        font-size: 2.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1.2rem 1rem;
+      }
+
+      .main-container {
+        gap: 2rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .page-header p {
+        font-size: 0.9rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+        border-radius: 2rem;
+      }
+
+      .lock-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2.2rem;
+      }
+
+      .video-overlay-icon {
+        width: 65px;
+        height: 65px;
+        font-size: 2.2rem;
+      }
+
+      .price {
+        font-size: 2.4rem;
+      }
+
+      .payment-button {
+        padding: 1rem 1.2rem;
+        font-size: 0.95rem;
+      }
+
+      .secure-payment {
+        gap: 0.6rem;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-glow"></div>
+
+  <div class="main-container">
+    <!-- En-tête global -->
+    <header class="page-header">
+      <h1>Collection Premium</h1>
+      <p>Choisissez votre accès : photos haute définition ou vidéos exclusives. Paiement unique, accès à vie.</p>
+    </header>
+
+    <!-- Grille des deux sections -->
+    <div class="sections-grid">
+      
+      <!-- ===== SECTION PHOTOS (15€) ===== -->
+      <div class="card">
+        <!-- Badge type -->
+        <span class="content-type-badge photos-badge">
+          <i class="fas fa-camera"></i> Photos
+        </span>
+
+        <!-- Aperçu flouté -->
+        <div class="media-preview">
+          <img 
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop" 
+            alt="Aperçu flouté des photos premium"
+          >
+          <div class="lock-overlay">
+            <div class="lock-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <span class="media-label">
+              <i class="fas fa-image" style="margin-right: 0.3rem;"></i> Pack photos exclusif
+            </span>
+          </div>
+        </div>
+
+        <!-- Contenu -->
+        <div class="card-content">
+          <h2 class="photos-title">Pack Photos HD</h2>
+          <p class="card-description">
+            Accédez à une collection de Photos en haute résolution 
+             et prêtes à télécharger.
+          </p>
+
+          <div class="features">
+            <div class="feature photos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>+150 photos 4K </span>
+            </div>
+            <div class="feature photos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Téléchargement illimité</span>
+            </div>
+            <div class="feature photos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Accès à vie immédiat</span>
+            </div>
+          </div>
+
+          <div class="price-section">
+            <span class="price photos-price">15€</span>
+            <span class="price-period">paiement unique</span>
+          </div>
+
+          <button class="payment-button photos-button" id="payPhotos">
+            <i class="fas fa-lock"></i> Payer 15€ et accéder
+            <i class="fas fa-arrow-right"></i>
+          </button>
+
+          <div class="secure-payment">
+            <span><i class="fas fa-shield-alt"></i> Paiement sécurisé</span>
+            <span><i class="fas fa-credit-card"></i> CB, PayPal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION VIDÉOS (20€) ===== -->
+      <div class="card">
+        <!-- Badge type -->
+        <span class="content-type-badge videos-badge">
+          <i class="fas fa-video"></i> Vidéos
+        </span>
+
+        <!-- Aperçu flouté avec icône play -->
+        <div class="media-preview">
+          <img 
+            src="https://images.unsplash.com/photo-1536240474777-2c1c2c8c8c8c?q=80&w=2070&auto=format&fit=crop" 
+            alt="Aperçu flouté des vidéos premium"
+            onerror="this.src='https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2070&auto=format&fit=crop'"
+          >
+          <div class="video-overlay-icon">
+            <i class="fas fa-play" style="margin-left: 5px;"></i>
+          </div>
+          <div class="lock-overlay">
+            <div class="lock-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <span class="media-label">
+              <i class="fas fa-film" style="margin-right: 0.3rem;"></i> Pack vidéos exclusif
+            </span>
+          </div>
+        </div>
+
+        <!-- Contenu -->
+        <div class="card-content">
+          <h2 class="videos-title">Pack Vidéos 4K</h2>
+          <p class="card-description">
+            Plongez dans ma collection de vidéos exclusives en 4K, 
+            avec une qualité cinématographique.
+          </p>
+
+          <div class="features">
+            <div class="feature videos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>+40 vidéos 4K </span>
+            </div>
+            <div class="feature videos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Streaming & téléchargement</span>
+            </div>
+            <div class="feature videos-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Accès à vie immédiat</span>
+            </div>
+          </div>
+
+          <div class="price-section">
+            <span class="price videos-price">20€</span>
+            <span class="price-period">paiement unique</span>
+          </div>
+
+          <button class="payment-button videos-button" id="payVideos">
+            <i class="fas fa-lock"></i> Payer 20€ et accéder
+            <i class="fas fa-arrow-right"></i>
+          </button>
+
+          <div class="secure-payment">
+            <span><i class="fas fa-shield-alt"></i> Paiement sécurisé</span>
+            <span><i class="fas fa-credit-card"></i> CB, PayPal</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Bouton Photos
+      const payPhotosBtn = document.getElementById('payPhotos');
+      payPhotosBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        animateButton(payPhotosBtn);
+        setTimeout(() => {
+          alert('Redirection vers la passerelle de paiement sécurisée.\n\n' +
+                'Produit : Pack Photos HD\n' +
+                'Montant : 15,00 €\n\n' +
+                'Après paiement, vous aurez accès immédiatement à toutes les photos.');
+        }, 150);
+      });
+
+      // Bouton Vidéos
+      const payVideosBtn = document.getElementById('payVideos');
+      payVideosBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        animateButton(payVideosBtn);
+        setTimeout(() => {
+          alert('Redirection vers la passerelle de paiement sécurisée.\n\n' +
+                'Produit : Pack Vidéos 4K\n' +
+                'Montant : 20,00 €\n\n' +
+                'Après paiement, vous aurez accès immédiatement à toutes les vidéos.');
+        }, 150);
+      });
+
+      // Animation de feedback sur les boutons
+      function animateButton(button) {
+        button.style.transform = 'scale(0.97)';
+        setTimeout(() => {
+          button.style.transform = '';
+        }, 130);
+      }
+
+      // Léger effet de parallaxe sur les cartes (au survol)
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `perspective(1000px) rotateX(${y * 2}deg) rotateY(${x * 2}deg) translateY(-6px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
